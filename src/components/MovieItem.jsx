@@ -28,7 +28,7 @@ class MovieItem extends React.Component {
                                 }}>Remove Watch</button>) : (
                                 <button type="button" className="btn btn-secondary btn-sm"
                                     onClick={() => {
-                                        this.setState({ willWatch: true });
+                                        this.setState({ willWatch: true });  
                                         addMoviesToWillWatch(movie);
                                     }}>Will Watch</button>
                             )}
