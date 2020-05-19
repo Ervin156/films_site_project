@@ -1,7 +1,9 @@
 import React from 'react';
-import { moviesData } from './settings/MovieData'
-import './style.css';
+// import { moviesData } from './settings/MovieData'
+import { API_URL, API_KEY_3, API_KEY_4 } from './settings/api'
+import './style.scss';
 import MovieItem from './MovieItem';
+import MovieTabs from './MovieTabs';
 
 
 class App extends React.Component {
@@ -9,9 +11,22 @@ class App extends React.Component {
     super();
 
     this.state = {
-      movies: moviesData,
-      moviesWillWatch: []
+      movies: [],
+      moviesWillWatch: [],
+      sort_by: 'popularity.desc'
     };
+  }
+  componentDidMount() {
+    const url = `${API_URL}/discover/movie?api_key=${API_KEY_3}&sort_by=${this.state.sort_by}`;
+    console.log('did mount');
+    fetch(url)
+      .then(data => {
+        return data.json();
+      })
+      .then(data => {
+        console.log(data.results[0]);
+        this.setState({ movies: data.results })
+      })
   }
   removeMovie = movie => {
     const updateMovies = this.state.movies.filter(item => {
@@ -31,11 +46,21 @@ class App extends React.Component {
     this.setState({ moviesWillWatch: updateMoviesWillWatch })
   }
 
+  updateSortBy = value => this.setState({ sort_by: value });
+
   render() {
+
     return (
       <div className="container">
-        <div className='row'>
+        <div className='row mt-4'>
           <div className='col-9'>
+            <div className='row mb-4'>
+              <div className='col-12'>
+                <MovieTabs 
+                sort_by={this.state.sort_by} 
+                updateSortBy={this.updateSortBy}/>
+              </div>
+            </div>
             <div className='row'>
               {this.state.movies.map(movie => {
                 return (
@@ -52,7 +77,19 @@ class App extends React.Component {
             </div>
           </div>
           <div className='col-3'>
-            <p>Will watch: {this.state.moviesWillWatch.length}</p>
+            {/* <p>Will watch: {this.state.moviesWillWatch.length}</p> */}
+            <h4>Will Watch: {this.state.moviesWillWatch.length} movies</h4>
+            <ul className="list-group">
+              {this.state.moviesWillWatch.map(movie => (
+                <li key={movie.id} className="list-group-item">
+                  <div className="d-flex justify-content-between">
+                    {/* <img src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path || movie.poster_path}`} alt="" height='auto' width='40' /> */}
+                    <p>{movie.title}</p>
+                    <p>{movie.vote_average}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
