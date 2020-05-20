@@ -16,9 +16,26 @@ class App extends React.Component {
       sort_by: 'popularity.desc'
     };
   }
+
+
+
   componentDidMount() {
+
+    // console.log('did mount');
+    this.getMovies();
+  }
+  //Данный метод предоставляет предыдущее и измененное значение пропса и стейта
+  componentDidUpdate(prevProps, prevState) {
+    // console.log('prev:\t', prevProps, prevState);
+    // console.log('this:\t', this.props, this.state);
+    if (prevState.sort_by !== this.state.sort_by) {
+      // console.log('call api');
+      this.getMovies();
+    }
+  }
+
+  getMovies = () => {
     const url = `${API_URL}/discover/movie?api_key=${API_KEY_3}&sort_by=${this.state.sort_by}`;
-    console.log('did mount');
     fetch(url)
       .then(data => {
         return data.json();
@@ -28,6 +45,7 @@ class App extends React.Component {
         this.setState({ movies: data.results })
       })
   }
+
   removeMovie = movie => {
     const updateMovies = this.state.movies.filter(item => {
       return item.id !== movie.id;
@@ -56,9 +74,9 @@ class App extends React.Component {
           <div className='col-9'>
             <div className='row mb-4'>
               <div className='col-12'>
-                <MovieTabs 
-                sort_by={this.state.sort_by} 
-                updateSortBy={this.updateSortBy}/>
+                <MovieTabs
+                  sort_by={this.state.sort_by}
+                  updateSortBy={this.updateSortBy} />
               </div>
             </div>
             <div className='row'>
