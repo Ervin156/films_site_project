@@ -1,6 +1,6 @@
 import React from 'react';
 // import { moviesData } from './settings/MovieData'
-import { API_URL, API_KEY_3, API_KEY_4 } from './settings/api'
+import { API_URL, API_KEY_3 } from './settings/api'
 import './style.scss';
 import MovieItem from './MovieItem';
 import MovieTabs from './MovieTabs';
@@ -13,14 +13,14 @@ class App extends React.Component {
     this.state = {
       movies: [],
       moviesWillWatch: [],
-      sort_by: 'popularity.desc'
+      sort_by: 'popularity.desc',
+      page: 1,
+      total_pages: '',
     };
+    this.getPages();
   }
 
-
-
   componentDidMount() {
-
     // console.log('did mount');
     this.getMovies();
   }
@@ -32,17 +32,35 @@ class App extends React.Component {
       // console.log('call api');
       this.getMovies();
     }
+    if (prevState.page !== this.state.page) {
+      setTimeout(() => {
+        this.getMovies();
+      })
+
+    }
+    let total = this.state.total_pages;
+    if (prevState.page === '1' || this.state.page < 1) {
+      this.setState({ page: total })
+    }
+    if (this.state.page === total + 1) {
+      this.setState({ page: 1 })
+    }
+    console.log(this.state.page);
+  }
+
+  getPages = () => {
+    this.updateNumberPage();
   }
 
   getMovies = () => {
-    const url = `${API_URL}/discover/movie?api_key=${API_KEY_3}&sort_by=${this.state.sort_by}`;
+    const url = `${API_URL}/discover/movie?api_key=${API_KEY_3}&sort_by=${this.state.sort_by}&page=${this.state.page}`;
     fetch(url)
       .then(data => {
         return data.json();
       })
       .then(data => {
-        console.log(data.results[0]);
         this.setState({ movies: data.results })
+        this.setState({ total_pages: data.total_pages })
       })
   }
 
@@ -65,6 +83,16 @@ class App extends React.Component {
   }
 
   updateSortBy = value => this.setState({ sort_by: value });
+  updateNumberPage = (value) => {
+    let count = this.state.page;
+    if (value === "next") {
+      this.setState({ page: count + 1 })
+    }
+    if (value === "prev") {
+      this.setState({ page: count - 1 })
+    }
+    console.log(value);
+  };
 
   render() {
 
@@ -73,10 +101,17 @@ class App extends React.Component {
         <div className='row mt-4'>
           <div className='col-9'>
             <div className='row mb-4'>
+            <div className="col-3">
+            <h4>Page {"\t" + this.state.page + "\t"} of {"\t" + this.state.total_pages}</h4>
+          </div>
               <div className='col-12'>
                 <MovieTabs
+                  page={this.state.page}
+                  totalPage={this.state.total_pages}
+                  updateNumberPage={this.updateNumberPage}
                   sort_by={this.state.sort_by}
                   updateSortBy={this.updateSortBy} />
+
               </div>
             </div>
             <div className='row'>
@@ -108,6 +143,9 @@ class App extends React.Component {
                 </li>
               ))}
             </ul>
+          </div>
+          <div className="col-3">
+            <h4>Page {"\t" + this.state.page + "\t"} of {"\t" + this.state.total_pages}</h4>
           </div>
         </div>
       </div>
