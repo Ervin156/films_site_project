@@ -42,7 +42,7 @@ class App extends React.Component {
     if (prevState.page === '1' || this.state.page < 1) {
       this.setState({ page: total })
     }
-    if (this.state.page === total + 1) {
+    if (this.state.page === total +1 ) {
       this.setState({ page: 1 })
     }
     console.log(this.state.page);
